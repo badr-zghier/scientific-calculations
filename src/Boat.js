@@ -7,31 +7,73 @@ const THROTTLE_ACC_SCALE = 0.5;
 
 class Boat extends Grid {
   constructor(options = {}) {
-    const color = options.color || Boat.getRandomBoatColor();
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshStandardMaterial({ roughness: 0.9, color });
-    const mesh = new THREE.Mesh(geometry, material);
-    options.mesh = mesh;
-    super(options);
-    this.velocity = new THREE.Vector3();
-    this.acceleration = new THREE.Vector3();
-    this.angularVelocity = new THREE.Vector3();
-    this.angularAcceleration = new THREE.Vector3();
-    this.mesh.rotation.y = Math.PI; // 180 درجة في اتجاه عقارب الساعة (غرب) إذا كان المحور Y هو محور الدوران
+    // Extract color from options
+    const color = options.color;
 
+    // Create the boat's geometry (a simple box shape)
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+
+    // Create the boat's material with specified roughness and color
+    const material = new THREE.MeshStandardMaterial({ roughness: 0.9, color });
+
+    // Combine the geometry and material into a mesh (the visible 3D object)
+    const mesh = new THREE.Mesh(geometry, material);
+
+    // Assign the created mesh to the options object so it can be used by the parent class
+    options.mesh = mesh;
+
+    // Call the parent class (Grid) constructor with the options object
+    super(options);
+
+    // Initialize the boat's velocity vector (for linear movement)
+    this.velocity = new THREE.Vector3();
+
+    // Initialize the boat's acceleration vector (for linear acceleration)
+    this.acceleration = new THREE.Vector3();
+
+    // Initialize the boat's angular velocity vector (for rotational movement)
+    this.angularVelocity = new THREE.Vector3();
+
+    // Initialize the boat's angular acceleration vector (for rotational acceleration)
+    this.angularAcceleration = new THREE.Vector3();
+
+    // Rotate the boat 180 degrees around the Y-axis (likely to face west)
+    this.mesh.rotation.y = Math.PI; // 180 degrees clockwise (west) if Y-axis is the rotation axis
+
+    // Initialize the bobbing motion parameters with a random starting point
     this.bob = { t: Math.random() * 999, y: 0 };
+
+    // Initialize the throttle, which controls the boat's speed
     this.throttle = 0;
+
+    // Set the rate at which the throttle increases
     this.throttleSpeed = 1;
+
+    // Set the maximum throttle value (speed limit)
     this.maxThrottle = 0.1;
+
+    // Initialize a cooldown timer for the throttle, preventing immediate reactivation
     this.throttleCooldown = new Cooldown(0, 0.3);
 
+    // Reference to the world grid, possibly for collision detection or spatial awareness
     this.worldGrid = options.worldGrid;
+
+    // Set the water level, which could be used for buoyancy calculations
     this.waterLevel = options.waterLevel || 0;
+
+    // Flag to indicate whether the boat is sinking
     this.isSinking = false;
 
+    // Initialize the sail angle, which might affect the boat's movement in the wind
     this.sailAngle = 0;
+
+    // Set the mass of the boat, important for physics calculations like inertia
     this.mass = options.mass || 1;
+
+    // Set the volume of the boat that is submerged, important for buoyancy
     this.submergedVolume = options.submergedVolume || 1;
+
+    // Set the wet area of the boat, which could be used to calculate drag in the water
     this.wetArea = options.wetArea || 1;
   }
 
