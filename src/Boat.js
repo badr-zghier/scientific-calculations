@@ -77,37 +77,61 @@ class Boat extends Grid {
     this.wetArea = options.wetArea || 1;
   }
 
-  // static getRandomBoatColor() {
-  //     const rand = (n) => Math.random() * n;
-  //     const r = rand(1);
-  //     const g = rand(1);
-  //     const b = rand(1);
-  //     return new THREE.Color(r, g, b);
-  // }
+  // gravity force
+  calculateGravityForce() {
+    return this.mass * 9.8;
+  }
+  // Byoyant force
+  calculateBuoyantForce() {
+    const densityOfWater = 1000;
+    return densityOfWater * this.submergedVolume * 9.8;
+  }
 
+  // Method to increase the throttle value, which controls the speed of the vehicle
   throttleUp() {
+    // If the throttle is on cooldown (i.e., recently adjusted), do nothing
     if (this.throttleCooldown.isHot()) return;
+
+    // Increase the throttle value, ensuring it doesn't exceed the maximum throttle limit
     this.throttle = Math.min(this.maxThrottle, this.throttle + THROTTLE_UP_PER);
+
+    // Activate the cooldown to prevent immediate further adjustments
     this.throttleCooldown.heat();
   }
 
+  // Method to decrease the throttle value, reducing the speed of the vehicle
   throttleDown() {
+    // If the throttle is on cooldown, do nothing
     if (this.throttleCooldown.isHot()) return;
+
+    // Decrease the throttle value, ensuring it doesn't drop below 0 (no reverse throttle)
     this.throttle = Math.max(0, this.throttle - 1);
+
+    // Activate the cooldown to prevent immediate further adjustments
     this.throttleCooldown.heat();
   }
 
+  // Method to apply the current throttle value to the velocity of the vehicle
   applyThrottleVelocity() {
+    // Get the direction the vehicle is currently facing as a 2D vector
     const directionVec2 = this.getFacingVector2();
+
+    // Convert the 2D direction vector into a 3D vector, assuming Y-axis (up) remains 0
     const throttleDirectionVec3 = new THREE.Vector3(
-      directionVec2.y,
-      0,
-      directionVec2.x
+      directionVec2.y, // Z-axis component in 3D space
+      0, // Y-axis component (up/down) remains 0, assuming no vertical movement
+      directionVec2.x // X-axis component in 3D space
     );
+
+    // Calculate the throttle's effect on acceleration, scaled by a constant
     const throttleScale = this.throttle * THROTTLE_ACC_SCALE;
     const throttleAcceleration =
       throttleDirectionVec3.multiplyScalar(throttleScale);
+
+    // Apply the calculated throttle acceleration to the vehicle's acceleration
     this.applyAcceleration(throttleAcceleration);
+
+    // Update the object's acceleration property to reflect the new throttle acceleration
     this.acceleration.copy(throttleAcceleration);
   }
 
@@ -140,11 +164,6 @@ class Boat extends Grid {
     return kineticEnergy;
   }
 
-  calculateBuoyantForce() {
-    const densityOfWater = 1000;
-    return densityOfWater * this.submergedVolume * 9.8;
-  }
-
   claculateWindForce() {
     const windSpeed =
       parseFloat(document.getElementById("windSpeedInput").value) || 5;
@@ -171,11 +190,6 @@ class Boat extends Grid {
     // حساب العزم الناتج عن الرياح
     const windTorque = windForce * distanceFromCenter;
     return windTorque;
-  }
-
-  // gravity force
-  calculateGravityForce() {
-    return this.mass * 9.8;
   }
 
   // Boat Momentum
