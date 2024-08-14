@@ -83,7 +83,6 @@ class Boat extends Grid {
 
   turn(turnAmount) {
     this.updateSailAngle(); // تحديث زاوية الشراع
-
     const angAcc = new THREE.Vector3(0, turnAmount * 0.02, 0);
     this.applyAngularAcceleration(angAcc);
   }
@@ -104,14 +103,13 @@ class Boat extends Grid {
     return densityOfWater * this.submergedVolume * 9.8;
   }
 
-  calculateThrustForce() {
+  claculateWindForce() {
     const windSpeed =
-      parseFloat(document.getElementById("windSpeedInput").value) || 5; // قيمة افتراضية
+      parseFloat(document.getElementById("windSpeedInput").value) || 5;
     const sailArea =
-      parseFloat(document.getElementById("sailAreaInput").value) || 10; // قيمة افتراضية
-    const airDensity = 1.225; // كثافة الهواء (كجم/م³)
-    const efficiency = 0.5; // كفاءة الشراع، جرب تغييرها
-
+      parseFloat(document.getElementById("sailAreaInput").value) || 10;
+    const airDensity = 1.225;
+    const efficiency = 0.5;
     const dynamicPressure = 0.5 * airDensity * windSpeed * windSpeed;
     const thrustForce = efficiency * dynamicPressure * sailArea;
     return thrustForce;
@@ -133,10 +131,12 @@ class Boat extends Grid {
     return windTorque;
   }
 
+  // gravity force
   calculateGravityForce() {
     return this.mass * 9.8;
   }
 
+  // Boat Momentum
   calculateMomentum() {
     return this.mass * this.velocity.length();
   }
@@ -158,7 +158,7 @@ class Boat extends Grid {
     const waterSpeed = parseFloat(
       document.getElementById("waterSpeedInput").value
     );
-    const waterMass = this.mass; // كتلة الماء تساوي كتلة القارب
+    const waterMass = this.mass; // كتلة الماء تساوي كتلة ابلقار
 
     // حساب كمية الحركة
     const waterMomentum = waterMass * waterSpeed;
@@ -257,7 +257,7 @@ class Boat extends Grid {
       windTorque.toFixed(2);
 
     // عرض قوة الدفع على الشاشة
-    const thrustForce = this.calculateDragForce() + this.calculateThrustForce();
+    const thrustForce = this.calculateDragForce() + this.claculateWindForce();
     document.getElementById("thrustForceDisplay").innerText =
       thrustForce.toFixed(2);
 
@@ -299,15 +299,13 @@ class Boat extends Grid {
     const boatDirection = this.getCompassDirection();
 
     let windSpeed = parseFloat(document.getElementById("windSpeedInput").value);
-    if (windSpeed <= 0) return; // إذا كانت سرعة الرياح 0 أو أقل، فلا حاجة للتعديل
+    if (windSpeed <= 0) return;
 
     const directions = ["N", "E", "S", "W"];
     const windIndex = directions.indexOf(windDirection.charAt(0).toUpperCase());
     const boatIndex = directions.indexOf(boatDirection.charAt(0).toUpperCase());
 
-    // مقارنة الاتجاهات
     if (windIndex === boatIndex) {
-      // الرياح في نفس اتجاه القارب، أضف سرعة الرياح
       this.velocity.add(
         this.velocity
           .clone()
@@ -382,7 +380,7 @@ class Boat extends Grid {
     if (this.throttle) this.applyThrottleVelocity();
 
     // إضافة قوة الدفع إلى السرعة
-    const thrustForce = this.calculateThrustForce();
+    const thrustForce = this.claculateWindForce();
     this.velocity.add(
       this.velocity
         .clone()
