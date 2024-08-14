@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Boat Control Panel</title>
+    <style>
+/* تحسين تنسيق لوحة المعلومات */
+#infoPanel {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    z-index: 999;
+    background-color: rgba(45, 45, 45, 0.9);
+    padding: 10px; /* تقليل المساحة الداخلية لتصغير اللوحة */
+    border-radius: 10px;
+    color: #ffffff;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 12px; /* تصغير حجم النص */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    max-width: 240px; /* تقليل عرض اللوحة */
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* تقليل المسافة بين العناصر */
+    border: 1px solid #3a3a3a;
+    backdrop-filter: blur(8px);
+}
+
+.infoItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0; /* تقليل المساحة الداخلية لكل عنصر */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.infoItem:last-child {
+    border-bottom: none;
+}
+
+.infoLabel {
+    font-weight: bold;
+    font-size: 11px; /* تصغير حجم النص */
+    color: #ffab40;
+    text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.5);
+}
+
+.infoValue {
+    text-align: right;
+    font-size: 11px; /* تصغير حجم النص */
+    background-color: rgba(255, 255, 255, 0.08);
+    padding: 4px 6px; /* تقليل المساحة الداخلية للقيمة */
+    border-radius: 6px;
+    color: #e0e0e0;
+    border: 1px solid #ffab40;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+/* تحسين لوحة التحكم */
+#controlPanel {
+    position: absolute;
+    top:  80px; /* نقلها إلى الأسفل */
+    left: 20px; /* نقلها إلى اليسار */
+    z-index: 999;
+    background-color: #1a1a1a; /* خلفية سوداء */
+    padding: 20px;
+    border-radius: 0px; /* زوايا مربعة */
+    color: #ffffff; /* نص أبيض */
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.8); /* ظل كبير ومركز */
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* عرض العناصر في شبكة */
+    gap: 15px;
+    max-width: 300px;
+    transition: transform 0.3s ease-in-out;
+}
+
+#controlPanel:hover {
+    transform: translateY(-10px); /* رفع اللوحة عند التمرير */
+}
+
+.inputContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: #333333; /* خلفية رمادية داكنة */
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #ff5722; /* خط على الجانب الأيسر */
+    transition: background-color 0.3s ease, border-left-color 0.3s ease;
+}
+
+.inputContainer:hover {
+    background-color: #444444; /* تفتيح الخلفية عند التمرير */
+    border-left-color: #ff9800; /* تغيير لون الخط عند التمرير */
+}
+
+.inputContainer label {
+    color: #ff9800; /* لون نص برتقالي */
+    font-weight: normal; /* نص غير عريض */
+    text-transform: uppercase; /* تحويل النص إلى حروف كبيرة */
+    font-size: 12px; /* حجم نص صغير */
+}
+
+.inputContainer input {
+    width: calc(100% - 20px); /* ملء العرض مع حساب الحواف */
+    padding: 8px;
+    border-radius: 3px;
+    border: 2px solid #444444; /* حد رمادي داكن */
+    background-color: #1a1a1a; /* خلفية سوداء */
+    color: #ffffff; /* نص أبيض */
+    font-size: 14px; /* حجم نص أكبر */
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.inputContainer input:focus {
+    border-color: #ff5722; /* تغيير لون الحد عند التركيز */
+    background-color: #222222; /* خلفية أكثر قتامة */
+    outline: none; /* إزالة الإطار الافتراضي */
+}
+
+
+
+
+
+    </style>
+</head>
+<body scroll="no">
+    <div id="controlPanel">
+        <div class="inputContainer">
+            <label for="weightInput">Weight (kg):</label>
+            <input type="number" id="weightInput" value="0">
+        </div>
+        <div class="inputContainer">
+            <label for="submergedVolumeInput">Submerged Volume (m^3):</label>
+            <input type="number" id="submergedVolumeInput" value="0">
+        </div>
+        <div class="inputContainer">
+            <label for="waveHeightInput">Wave Height (m):</label>
+            <input type="number" id="waveHeightInput" step="0.1" min="0" value="0">
+        </div>
+        <div class="inputContainer">
+            <label for="wetAreaInput">Wet Area (m²):</label>
+            <input type="number" id="wetAreaInput" step="0.01" min="0" value="0">
+        </div>
+        <div class="inputContainer">
+            <label for="windSpeedInput">Wind Speed (m/s):</label>
+            <input type="number" id="windSpeedInput" step="1" min="0" value="0">
+        </div>
+        <div class="inputContainer">
+            <span class="infoLabel">Sail Area:</span> 
+            <input type="number" id="sailAreaInput" value="1" step="0.1" min="0.1">
+        </div>
+        <div class="inputContainer">
+            <label for="waterSpeedInput">Water Speed Before Collision (m/s):</label>
+            <input type="number" id="waterSpeedInput" step="0.1" min="0" value="0">
+        </div>
+        
+        <div class="inputContainer">
+            <label for="windDirectionInput">Wind Direction:</label>
+            <select id="windDirectionInput">
+                <option value="North">N</option>
+                <option value="South">S</option>
+                <option value="East">E</option>
+                <option value="West">W</option>
+            </select>
+        </div>
+        
+
+    </div>
+    
+    <div id="infoPanel">
+        <div class="infoItem"><span class="infoLabel">Boat Speed:</span> <span id="speedDisplay" class="infoValue">0</span> (m/s)</div>
+        <div class="infoItem"><span class="infoLabel">Boat Momentum:</span> <span id="momentumDisplay" class="infoValue">0</span> (kg . m/s)</div>
+        <div class="infoItem"><span class="infoLabel">Boat Kinetic energy :</span> <span id="kineticEnergyDisplay" class="infoValue">0</span> ( j )</div>
+
+        <div class="infoItem"><span class="infoLabel">Acceleration:</span> <span id="accelerationDisplay" class="infoValue">0</span> (m/s²)</div>
+        <div class="infoItem"><span class="infoLabel">Boat Rotation:</span> <span id="rotationDisplay" class="infoValue">0</span> rad</div>
+        <div class="infoItem"><span class="infoLabel">Buoyant Force:</span> <span id="buoyantForceDisplay" class="infoValue">0</span> (N)</div>
+        <div class="infoItem"><span class="infoLabel">Gravity Force:</span> <span id="gravityForceDisplay" class="infoValue">0</span> (N)</div>
+        <div class="infoItem"><span class="infoLabel">Angular Speed:</span> <span id="angularSpeedDisplay" class="infoValue">0</span> (rad/s)</div>
+        <div class="infoItem"><span class="infoLabel">Wave Force:</span> <span id="waveForceDisplay" class="infoValue">0</span> (N)</div>
+        <div class="infoItem"><span class="infoLabel">Drag Force:</span> <span id="dragForceDisplay" class="infoValue">0</span> (N)</div>
+        <div class="infoItem"><span class="infoLabel">Sail Angle:</span><span id="sailAngleDisplay" class="infoValue">0.00</span> (rad)</div>
+        <div class="infoItem"><span class="infoLabel">Wind Torque:</span> <span id="windTorqueDisplay" class="infoValue">0</span> (Nm)</div>
+        <div class="infoItem"><span class="infoLabel">Thrust Force:</span> <span id="thrustForceDisplay" class="infoValue">0</span> (N)</div>
+        <div class="infoItem"><span class="infoLabel">Boat Side :</span> <span id="compassDirectionDisplay" class="infoValue">0</span> </div>
+        <div class="infoItem"><span class="infoLabel">Water Momentum:</span> <span id="waterMomentumDisplay" class="infoValue">0</span> (kg . m/s)</div>
+<div class="infoItem"><span class="infoLabel">Water Kinetic Energy:</span> <span id="waterKineticEnergyDisplay" class="infoValue">0</span> (J)</div>
+
+    </div>
+    
+
+    
+    <div id="navigation">
+        <div id="compass">
+            <div class="needle"></div>
+          
+        </div>
+        <div id="speedometer">
+                <div id="speedNumber"></div>
+                <div class="needle"></div>
+            </div>
+        </div>
+    </div>
+    
+    
+    
+    <main id="main">
+        <div id="container"></div>
+    </main>
+
+    <script type="module" src="./src/index.js"></script>
+</body>
+</html>
+
+
