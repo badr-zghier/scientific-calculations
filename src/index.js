@@ -26,6 +26,7 @@ const renderer = new Renderer({
   pixelated: true, // Ensures sharp edges in the rendering
 });
 
+renderer.setSize(window.innerWidth, window.innerHeight);
 // Setting up the first camera, which provides a view of the scene from a specific position
 const camera1 = new PerspectiveCamera(
   FOV,
@@ -51,7 +52,7 @@ const grid = new RealityGrid({ renderer, camera: camera1 });
 let stats; // To display performance statistics (e.g., FPS)
 let water; // To hold the water surface object
 let pcBoat; // To represent the boat
-let enemyBoats = []; // An array to hold enemy boat objects
+//let enemyBoats = []; // An array to hold enemy boat objects
 let mouseWheelWatcher; // To track and respond to mouse wheel movements (zoom)
 let controls; // For camera controls, allowing the user to move the camera around
 
@@ -156,7 +157,7 @@ function init() {
   const sky = new GameSky(grid.scene, grid.renderer); // Create a sky object
   grid.scene.add(sky); // Add the sky to the scene
 
-  // Initialize the player's boat with gravity and buoyancy settings
+  // Initialize the boat with gravity and buoyancy settings
   pcBoat = new Boat({
     color: 0xffffff, // Boat color (white)
     worldGrid: grid, // Reference to the world grid (scene manager)
@@ -207,55 +208,55 @@ function onRightClick(event) {
 }
 
 // Function to handle collisions between the boat and obstacles
-function handleBoatObstacleCollision(boat, obstacle) {
-  boat.handleCollisionWithObstacle(obstacle); // Call the boat's collision handling method
-}
+// function handleBoatObstacleCollision(boat, obstacle) {
+//   boat.handleCollisionWithObstacle(obstacle); // Call the boat's collision handling method
+// }
 
-// Function to create obstacles in the scene at specified positions
-function createObstacle(position, size) {
-  const geometry = new THREE.BoxGeometry(size, size, size); // Create a box geometry for the obstacle
-  const material = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red material for the obstacle
-  const obstacle = new THREE.Mesh(geometry, material); // Create a mesh for the obstacle
-  obstacle.position.set(position.x, position.y, position.z); // Set the obstacle's position
-  return obstacle; // Return the created obstacle
-}
+// // Function to create obstacles in the scene at specified positions
+// function createObstacle(position, size) {
+//   const geometry = new THREE.BoxGeometry(size, size, size); // Create a box geometry for the obstacle
+//   const material = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red material for the obstacle
+//   const obstacle = new THREE.Mesh(geometry, material); // Create a mesh for the obstacle
+//   obstacle.position.set(position.x, position.y, position.z); // Set the obstacle's position
+//   return obstacle; // Return the created obstacle
+// }
 
 // Initialize arrays to hold obstacles and their positions
 const obstacles = [];
 const obstaclePositions = [];
 
 // Add obstacles to the scene based on predefined positions
-obstaclePositions.forEach((pos) => {
-  const obstacle = createObstacle(pos, 50); // Create an obstacle at each position
-  grid.scene.add(obstacle); // Add the obstacle to the scene
-  obstacles.push(obstacle); // Add the obstacle to the obstacles array
-});
+// obstaclePositions.forEach((pos) => {
+//   const obstacle = createObstacle(pos, 50); // Create an obstacle at each position
+//   grid.scene.add(obstacle); // Add the obstacle to the scene
+//   obstacles.push(obstacle); // Add the obstacle to the obstacles array
+// });
 
-grid.obstacles = obstacles; // Store the obstacles in the grid's obstacles array
+//grid.obstacles = obstacles; // Store the obstacles in the grid's obstacles array
 
 // Function to check for collisions between the player's boat and obstacles/enemy boats
-function checkCollisions() {
-  let hits = 0; // Initialize a counter for the number of collisions
+// function checkCollisions() {
+//   let hits = 0; // Initialize a counter for the number of collisions
 
-  // Check for collisions between the player's boat and enemy boats
-  enemyBoats.forEach((b) => {
-    if (pcBoat.checkCollision(b)) {
-      // If a collision is detected
-      hits += 1; // Increment the collision counter
-      pcBoat.handleCollision(b); // Handle the collision
-    }
-  });
+//   // Check for collisions between the player's boat and enemy boats
+//   enemyBoats.forEach((b) => {
+//     if (pcBoat.checkCollision(b)) {
+//       // If a collision is detected
+//       hits += 1; // Increment the collision counter
+//       pcBoat.handleCollision(b); // Handle the collision
+//     }
+//   });
 
-  // Check for collisions between the player's boat and obstacles
-  obstacles.forEach((obstacle) => {
-    if (pcBoat.checkCollisionWithObstacle(obstacle)) {
-      hits += 1; // Increment the collision counter
-      handleBoatObstacleCollision(pcBoat, obstacle); // Handle the collision
-    }
-  });
+//   // Check for collisions between the player's boat and obstacles
+//   obstacles.forEach((obstacle) => {
+//     if (pcBoat.checkCollisionWithObstacle(obstacle)) {
+//       hits += 1; // Increment the collision counter
+//       handleBoatObstacleCollision(pcBoat, obstacle); // Handle the collision
+//     }
+//   });
 
-  console.log(hits); // Log the number of collisions
-}
+//   console.log(hits); // Log the number of collisions
+// }
 
 // Function to update the information panel with the boat's current status
 function updateInfoPanel() {
@@ -300,13 +301,13 @@ function animate() {
   // Update and render the grid (the scene)
   grid.update(t, nowTime); // Update the grid with the time delta
   grid.render(); // Render the grid
-  checkCollisions(); // Check for collisions in each frame
+  //checkCollisions(); // Check for collisions in each frame
 
   updateInfoPanel(); // Update the information panel with the latest data
 
-  // Position and orient the second camera behind the boat
-  camera2.position.copy(pcBoat.mesh.position).add(new Vector3(100, 300, -800));
-  camera2.lookAt(pcBoat.mesh.position); // Make the camera look at the boat
+  // // Position and orient the second camera behind the boat
+  // camera2.position.copy(pcBoat.mesh.position).add(new Vector3(100, 300, -800));
+  // camera2.lookAt(pcBoat.mesh.position); // Make the camera look at the boat
 
   requestAnimationFrame(animate); // Request the next frame to keep the loop going
   renderer.render(grid.scene, activeCamera); // Render the scene with the active camera
