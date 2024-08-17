@@ -4,6 +4,7 @@ import * as THREE from "three";
 
 const THROTTLE_UP_PER = 1;
 const THROTTLE_ACC_SCALE = 0.5;
+const TRROTTLE_DEACC_SCALE = -0.5;
 
 class Boat extends Grid {
   constructor(options = {}) {
@@ -79,7 +80,7 @@ class Boat extends Grid {
 
   // gravity force
   calculateGravityForce() {
-    return this.mass * 9.8;
+    return this.mass * 9.8 * 1000;
   }
   // Byoyant force
   calculateBuoyantForce() {
@@ -148,13 +149,12 @@ class Boat extends Grid {
   }
 
   turn(turnAmount) {
-    this.updateSailAngle(); // تحديث زاوية الشراع
+    this.updateSailAngle();
     const angAcc = new THREE.Vector3(0, turnAmount * 0.02, 0);
     this.applyAngularAcceleration(angAcc);
   }
 
   updateSailAngle() {
-    // معادلة لتحديث زاوية الشراع بناءً على زاوية دوران القارب
     this.sailAngle = this.rotation.y / 2;
   }
   calculateKineticEnergy() {

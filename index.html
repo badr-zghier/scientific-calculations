@@ -3,23 +3,23 @@
 <head>
     <title>Boat Control Panel</title>
     <style>
-/* تحسين تنسيق لوحة المعلومات */
+
 #infoPanel {
     position: absolute;
     top: 40px;
     right: 10px;
     z-index: 999;
     background-color: rgba(45, 45, 45, 0.9);
-    padding: 10px; /* تقليل المساحة الداخلية لتصغير اللوحة */
+    padding: 10px;
     border-radius: 10px;
     color: #ffffff;
     font-family: 'Roboto', Arial, sans-serif;
-    font-size: 12px; /* تصغير حجم النص */
+    font-size: 12px; 
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    max-width: 240px; /* تقليل عرض اللوحة */
+    max-width: 240px; 
     display: flex;
     flex-direction: column;
-    gap: 6px; /* تقليل المسافة بين العناصر */
+    gap: 6px; 
     border: 1px solid #3a3a3a;
     backdrop-filter: blur(8px);
 }
@@ -28,7 +28,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 4px 0; /* تقليل المساحة الداخلية لكل عنصر */
+    padding: 4px 0; 
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -38,16 +38,16 @@
 
 .infoLabel {
     font-weight: bold;
-    font-size: 11px; /* تصغير حجم النص */
+    font-size: 11px; 
     color: #ffab40;
     text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.5);
 }
 
 .infoValue {
     text-align: right;
-    font-size: 11px; /* تصغير حجم النص */
+    font-size: 11px; 
     background-color: rgba(255, 255, 255, 0.08);
-    padding: 4px 6px; /* تقليل المساحة الداخلية للقيمة */
+    padding: 4px 6px;
     border-radius: 6px;
     color: #e0e0e0;
     border: 1px solid #ffab40;
@@ -55,66 +55,66 @@
 }
 
 
-/* تحسين لوحة التحكم */
+
 #controlPanel {
     position: absolute;
-    top:  80px; /* نقلها إلى الأسفل */
-    left: 20px; /* نقلها إلى اليسار */
+    top:  80px; 
+    left: 20px; 
     z-index: 999;
-    background-color: #1a1a1a; /* خلفية سوداء */
+    background-color: #1a1a1a; 
     padding: 20px;
-    border-radius: 0px; /* زوايا مربعة */
-    color: #ffffff; /* نص أبيض */
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.8); /* ظل كبير ومركز */
+    border-radius: 0px;
+    color: #ffffff; 
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.8);
     display: grid;
-    grid-template-columns: 1fr 1fr; /* عرض العناصر في شبكة */
+    grid-template-columns: 1fr 1fr; 
     gap: 15px;
     max-width: 300px;
     transition: transform 0.3s ease-in-out;
 }
 
 #controlPanel:hover {
-    transform: translateY(-10px); /* رفع اللوحة عند التمرير */
+    transform: translateY(-10px); 
 }
 
 .inputContainer {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    background-color: #333333; /* خلفية رمادية داكنة */
+    background-color: #333333; 
     padding: 10px;
     border-radius: 5px;
-    border-left: 4px solid #ff5722; /* خط على الجانب الأيسر */
+    border-left: 4px solid #ff5722;
     transition: background-color 0.3s ease, border-left-color 0.3s ease;
 }
 
 .inputContainer:hover {
-    background-color: #444444; /* تفتيح الخلفية عند التمرير */
-    border-left-color: #ff9800; /* تغيير لون الخط عند التمرير */
+    background-color: #444444; 
+    border-left-color: #ff9800; 
 }
 
 .inputContainer label {
-    color: #ff9800; /* لون نص برتقالي */
-    font-weight: normal; /* نص غير عريض */
-    text-transform: uppercase; /* تحويل النص إلى حروف كبيرة */
-    font-size: 12px; /* حجم نص صغير */
+    color: #ff9800; 
+    font-weight: normal; 
+    text-transform: uppercase; 
+    font-size: 12px;
 }
 
 .inputContainer input {
-    width: calc(100% - 20px); /* ملء العرض مع حساب الحواف */
+    width: calc(100% - 20px); 
     padding: 8px;
     border-radius: 3px;
-    border: 2px solid #444444; /* حد رمادي داكن */
-    background-color: #1a1a1a; /* خلفية سوداء */
-    color: #ffffff; /* نص أبيض */
-    font-size: 14px; /* حجم نص أكبر */
+    border: 2px solid #444444; 
+    background-color: #1a1a1a; 
+    color: #ffffff; 
+    font-size: 14px; 
     transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 .inputContainer input:focus {
-    border-color: #ff5722; /* تغيير لون الحد عند التركيز */
-    background-color: #222222; /* خلفية أكثر قتامة */
-    outline: none; /* إزالة الإطار الافتراضي */
+    border-color: #ff5722; 
+    background-color: #222222; 
+    outline: none; 
 }
 
 
