@@ -190,7 +190,7 @@ class Boat extends Grid {
 
     // تحديث سرعة القارب بناءً على هذا الحساب
     this.velocity.setLength(velocityAfterCollision);
-
+    console.log(velocityAfterCollision);
     return velocityAfterCollision;
   }
 

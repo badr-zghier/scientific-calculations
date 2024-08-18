@@ -46,6 +46,7 @@ const camera2 = new PerspectiveCamera(
 );
 camera2.position.set(0, 50, 0); // Initial position of camera2 in the scene
 
+let activeCamera = camera1;
 // Create a RealityGrid instance to manage the scene and rendering
 const grid = new RealityGrid({ renderer, camera: camera1 });
 
