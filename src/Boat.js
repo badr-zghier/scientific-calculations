@@ -4,135 +4,68 @@ import * as THREE from "three";
 
 const THROTTLE_UP_PER = 1;
 const THROTTLE_ACC_SCALE = 0.5;
-const TRROTTLE_DEACC_SCALE = -0.5;
 
 class Boat extends Grid {
   constructor(options = {}) {
-    // Extract color from options
-    const color = options.color;
-
-    // Create the boat's geometry (a simple box shape)
+    const color = options.color || Boat.getRandomBoatColor();
     const geometry = new THREE.BoxGeometry(1, 1, 1);
-
-    // Create the boat's material with specified roughness and color
     const material = new THREE.MeshStandardMaterial({ roughness: 0.9, color });
-
-    // Combine the geometry and material into a mesh (the visible 3D object)
     const mesh = new THREE.Mesh(geometry, material);
-
-    // Assign the created mesh to the options object so it can be used by the parent class
     options.mesh = mesh;
-
-    // Call the parent class (Grid) constructor with the options object
     super(options);
-
-    // Initialize the boat's velocity vector (for linear movement)
     this.velocity = new THREE.Vector3();
-
-    // Initialize the boat's acceleration vector (for linear acceleration)
     this.acceleration = new THREE.Vector3();
-
-    // Initialize the boat's angular velocity vector (for rotational movement)
     this.angularVelocity = new THREE.Vector3();
-
-    // Initialize the boat's angular acceleration vector (for rotational acceleration)
     this.angularAcceleration = new THREE.Vector3();
+    this.mesh.rotation.y = Math.PI; // 180 درجة في اتجاه عقارب الساعة (غرب) إذا كان المحور Y هو محور الدوران
 
-    // Rotate the boat 180 degrees around the Y-axis (likely to face west)
-    this.mesh.rotation.y = Math.PI; // 180 degrees clockwise (west) if Y-axis is the rotation axis
-
-    // Initialize the bobbing motion parameters with a random starting point
     this.bob = { t: Math.random() * 999, y: 0 };
-
-    // Initialize the throttle, which controls the boat's speed
     this.throttle = 0;
-
-    // Set the rate at which the throttle increases
     this.throttleSpeed = 1;
-
-    // Set the maximum throttle value (speed limit)
     this.maxThrottle = 0.1;
-
-    // Initialize a cooldown timer for the throttle, preventing immediate reactivation
     this.throttleCooldown = new Cooldown(0, 0.3);
-
-    // Reference to the world grid, possibly for collision detection or spatial awareness
+    this.team = options.team || "neutral";
     this.worldGrid = options.worldGrid;
-
-    // Set the water level, which could be used for buoyancy calculations
-    this.waterLevel = options.waterLevel || 0;
-
-    // Flag to indicate whether the boat is sinking
-    this.isSinking = false;
-
-    // Initialize the sail angle, which might affect the boat's movement in the wind
+    this.waterLevel = options.waterLevel || 0; // مستوى سطح الماء
+    this.isSinking = false; // إضافة متغير لتتبع حالة الغرق
+    // زاوية دوران الشراع
     this.sailAngle = 0;
-
-    // Set the mass of the boat, important for physics calculations like inertia
-    this.mass = options.mass || 1;
-
-    // Set the volume of the boat that is submerged, important for buoyancy
-    this.submergedVolume = options.submergedVolume || 1;
-
-    // Set the wet area of the boat, which could be used to calculate drag in the water
-    this.wetArea = options.wetArea || 1;
+    this.mass = options.mass || 1; // تحديد الكتلة
+    this.submergedVolume = options.submergedVolume || 1; // حجم الجزء المغمور
+    this.wetArea = options.wetArea || 1; // مساحة الجزء المبلل
   }
 
-  // gravity force
-  calculateGravityForce() {
-    return this.mass * 9.8 * 1000;
-  }
-  // Byoyant force
-  calculateBuoyantForce() {
-    const densityOfWater = 1000;
-    return densityOfWater * this.submergedVolume * 9.8;
+  static getRandomBoatColor() {
+    const rand = (n) => Math.random() * n;
+    const r = rand(1);
+    const g = rand(1);
+    const b = rand(1);
+    return new THREE.Color(r, g, b);
   }
 
-  // Method to increase the throttle value, which controls the speed of the vehicle
   throttleUp() {
-    // If the throttle is on cooldown (i.e., recently adjusted), do nothing
     if (this.throttleCooldown.isHot()) return;
-
-    // Increase the throttle value, ensuring it doesn't exceed the maximum throttle limit
     this.throttle = Math.min(this.maxThrottle, this.throttle + THROTTLE_UP_PER);
-
-    // Activate the cooldown to prevent immediate further adjustments
     this.throttleCooldown.heat();
   }
 
-  // Method to decrease the throttle value, reducing the speed of the vehicle
   throttleDown() {
-    // If the throttle is on cooldown, do nothing
     if (this.throttleCooldown.isHot()) return;
-
-    // Decrease the throttle value, ensuring it doesn't drop below 0 (no reverse throttle)
     this.throttle = Math.max(0, this.throttle - 1);
-
-    // Activate the cooldown to prevent immediate further adjustments
     this.throttleCooldown.heat();
   }
 
-  // Method to apply the current throttle value to the velocity of the vehicle
   applyThrottleVelocity() {
-    // Get the direction the vehicle is currently facing as a 2D vector
     const directionVec2 = this.getFacingVector2();
-
-    // Convert the 2D direction vector into a 3D vector, assuming Y-axis (up) remains 0
     const throttleDirectionVec3 = new THREE.Vector3(
-      directionVec2.y, // Z-axis component in 3D space
-      0, // Y-axis component (up/down) remains 0, assuming no vertical movement
-      directionVec2.x // X-axis component in 3D space
+      directionVec2.y,
+      0,
+      directionVec2.x
     );
-
-    // Calculate the throttle's effect on acceleration, scaled by a constant
     const throttleScale = this.throttle * THROTTLE_ACC_SCALE;
     const throttleAcceleration =
       throttleDirectionVec3.multiplyScalar(throttleScale);
-
-    // Apply the calculated throttle acceleration to the vehicle's acceleration
     this.applyAcceleration(throttleAcceleration);
-
-    // Update the object's acceleration property to reflect the new throttle acceleration
     this.acceleration.copy(throttleAcceleration);
   }
 
@@ -149,12 +82,14 @@ class Boat extends Grid {
   }
 
   turn(turnAmount) {
-    this.updateSailAngle();
+    this.updateSailAngle(); // تحديث زاوية الشراع
+
     const angAcc = new THREE.Vector3(0, turnAmount * 0.02, 0);
     this.applyAngularAcceleration(angAcc);
   }
 
   updateSailAngle() {
+    // معادلة لتحديث زاوية الشراع بناءً على زاوية دوران القارب
     this.sailAngle = this.rotation.y / 2;
   }
   calculateKineticEnergy() {
@@ -164,13 +99,19 @@ class Boat extends Grid {
     return kineticEnergy;
   }
 
-  claculateWindForce() {
+  calculateBuoyantForce() {
+    const densityOfWater = 1;
+    return densityOfWater * this.submergedVolume * 9.8;
+  }
+
+  calculateThrustForce() {
     const windSpeed =
-      parseFloat(document.getElementById("windSpeedInput").value) || 5;
+      parseFloat(document.getElementById("windSpeedInput").value) || 5; // قيمة افتراضية
     const sailArea =
-      parseFloat(document.getElementById("sailAreaInput").value) || 10;
-    const airDensity = 1.225;
-    const efficiency = 0.5;
+      parseFloat(document.getElementById("sailAreaInput").value) || 10; // قيمة افتراضية
+    const airDensity = 1.225; // كثافة الهواء (كجم/م³)
+    const efficiency = 0.5; // كفاءة الشراع، جرب تغييرها
+
     const dynamicPressure = 0.5 * airDensity * windSpeed * windSpeed;
     const thrustForce = efficiency * dynamicPressure * sailArea;
     return thrustForce;
@@ -192,7 +133,10 @@ class Boat extends Grid {
     return windTorque;
   }
 
-  // Boat Momentum
+  calculateGravityForce() {
+    return this.mass * 9.8;
+  }
+
   calculateMomentum() {
     return this.mass * this.velocity.length();
   }
@@ -214,7 +158,7 @@ class Boat extends Grid {
     const waterSpeed = parseFloat(
       document.getElementById("waterSpeedInput").value
     );
-    const waterMass = this.mass; // كتلة الماء تساوي كتلة ابلقار
+    const waterMass = this.mass; // كتلة الماء تساوي كتلة القارب
 
     // حساب كمية الحركة
     const waterMomentum = waterMass * waterSpeed;
@@ -313,7 +257,7 @@ class Boat extends Grid {
       windTorque.toFixed(2);
 
     // عرض قوة الدفع على الشاشة
-    const thrustForce = this.calculateDragForce() + this.claculateWindForce();
+    const thrustForce = this.calculateDragForce() + this.calculateThrustForce();
     document.getElementById("thrustForceDisplay").innerText =
       thrustForce.toFixed(2);
 
@@ -355,13 +299,15 @@ class Boat extends Grid {
     const boatDirection = this.getCompassDirection();
 
     let windSpeed = parseFloat(document.getElementById("windSpeedInput").value);
-    if (windSpeed <= 0) return;
+    if (windSpeed <= 0) return; // إذا كانت سرعة الرياح 0 أو أقل، فلا حاجة للتعديل
 
     const directions = ["N", "E", "S", "W"];
     const windIndex = directions.indexOf(windDirection.charAt(0).toUpperCase());
     const boatIndex = directions.indexOf(boatDirection.charAt(0).toUpperCase());
 
+    // مقارنة الاتجاهات
     if (windIndex === boatIndex) {
+      // الرياح في نفس اتجاه القارب، أضف سرعة الرياح
       this.velocity.add(
         this.velocity
           .clone()
@@ -436,7 +382,7 @@ class Boat extends Grid {
     if (this.throttle) this.applyThrottleVelocity();
 
     // إضافة قوة الدفع إلى السرعة
-    const thrustForce = this.claculateWindForce();
+    const thrustForce = this.calculateThrustForce();
     this.velocity.add(
       this.velocity
         .clone()
